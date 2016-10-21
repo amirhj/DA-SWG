@@ -15,10 +15,18 @@ class Agent(threading.Threading):
 	
 	def run(self):
 		while not self.terminate:
-			pass
+			self.read_message()
+			self.process()
 	
 	def recieve(self, sender, content):
 		self.message_queue.put((sender, content))
 	
 	def send(self, reciever, content):
 		self.message_server.send((self.name, reciever, content, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+
+	def read_message(self):
+		while not self.message_queue.empty():
+			pass
+
+	def process(self):
+		pass

@@ -1,0 +1,130 @@
+{
+	"agents": [
+		{
+			"id": "a1",
+			"a": 7,
+			"b": 10
+		},
+		{
+			"id": "a2",
+			"a": 9,
+			"b": -70
+		},
+		{
+			"id": "a3",
+			"a": 0,
+			"b": 0
+		},
+		{
+			"id": "a4",
+			"a": 3.5,
+			"b": 3
+		},
+		{
+			"id": "a5",
+			"a": 8,
+			"b": 3
+		}
+	],
+	"sellers": {
+		"a1": {
+			"price": 5,
+			"max_delivery": 2000
+		},
+		"a2": {
+			"price": 7,
+			"max_delivery": 2800
+		},
+		"a3": {
+			"price": 9,
+			"max_delivery": 3600
+		},
+		"a4": {
+			"price": 2,
+			"max_delivery": 400
+		},
+		"a5": {
+			"price": 6,
+			"max_delivery": 2400
+		}
+	},
+	"buyers": {
+		"a1": {
+			"price": 3,
+			"max_demand": 1500,
+			"amplitude": [2.4, 5.1]
+		},
+		"a2": {
+			"price": 5,
+			"max_demand": 3200,
+			"amplitude": [2.92, 6.21]
+		},
+		"a3": {
+			"price": 3.3,
+			"max_demand": 50,
+			"amplitude": [1.25, 5]
+		},
+		"a4": {
+			"price": 1.25,
+			"max_demand": 4000,
+			"amplitude": [0.85, 1.81]
+		},
+		"a5": {
+			"price": 4,
+			"max_demand": 2500,
+			"amplitude": [2.8, 6]
+		}
+	},
+	"transfer_cost": [
+		{
+			"form": 1,
+			"to": 2,
+			"cost": 2
+		},
+		{
+			"form": 1,
+			"to": 4,
+			"cost": 1
+		},
+		{
+			"form": 2,
+			"to": 4,
+			"cost": 1.5
+		},
+		{
+			"form": 2,
+			"to": 5,
+			"cost": 0.5
+		},
+		{
+			"form": 3,
+			"to": 2,
+			"cost": 1
+		},
+		{
+			"form": 3,
+			"to": 4,
+			"cost": 2.5
+		},
+		{
+			"form": 3,
+			"to": 5,
+			"cost": 1.5
+		},
+		{
+			"form": 4,
+			"to": 1,
+			"cost": 1
+		},
+		{
+			"form": 5,
+			"to": 2,
+			"cost": 2
+		},
+		{
+			"form": 5,
+			"to": 4,
+			"cost": 0.5
+		}
+	]
+}

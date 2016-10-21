@@ -2,7 +2,7 @@ import threading, Queue
 
 
 class MessageServer(threading.Threading):
-	def __init__(self, opt, scheduler):
+	def __init__(self):
 		threading.Thread.__init__(self)
 		self.setDaemon(True)
 		self.message_queue = Queue.Queue()
