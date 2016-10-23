@@ -1,5 +1,6 @@
 import threading, Queue
 from datetime import datetime
+from util import PipeQueue
 
 
 class Auctioneer(threading.Threading):
@@ -15,6 +16,7 @@ class Auctioneer(threading.Threading):
 		self.message_types = {'submission': {}}
 		self.terminate = False
 		self.state = ('phase1', 'send-request')
+		self.sellers_prices = {s:PipeQueue(self.opt['convergence_size']) for s in self.grid.sellers}
 
 	
 	def run(self):
@@ -55,6 +57,8 @@ class Auctioneer(threading.Threading):
 							break
 				if all_responses:
 					self.run_phase1()
+		elif self.state[0] == 'phase2':
+			self.run_phase2()
 
 	def run_phase1(self):
 		# sorting sellers increasing
@@ -75,6 +79,8 @@ class Auctioneer(threading.Threading):
 				i += 1
 			if not inserted:
 				sellers.append(c)
+
+			self.sellers_prices[s].push(m['price'])
 
 		# sorting buyers decreasing
 		buyers = []
@@ -171,4 +177,23 @@ class Auctioneer(threading.Threading):
 				self.send(b, {'type':'out'})
 			i += 1
 
-		
+		# checking convergence
+		converged = True
+		for s in self.sellers_prices:
+			if self.sellers_prices[s].is_full():
+				if self.sellers_prices[s].get_standard_deviation() > self.opt['standard_deviation']:
+					converged = False
+					break
+			else:
+				converged = False
+				break
+
+		if converged:
+			self.state = ('phase2')
+		else:
+			self.state = ('phase1', 'send-request')
+	
+	def run_phase2(self):
+		pass
+
+
