@@ -188,6 +188,7 @@ class Auctioneer(threading.Threading):
 				converged = False
 				break
 
+		# decision how to progress
 		if converged:
 			self.state = ('phase2')
 		else:
