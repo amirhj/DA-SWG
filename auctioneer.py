@@ -3,7 +3,7 @@ from datetime import datetime
 from util import PipeQueue
 
 
-class Auctioneer(threading.Threading):
+class Auctioneer(threading.Thread):
 	def __init__(self, grid, message_server, opt):
 		threading.Thread.__init__(self)
 		self.setDaemon(True)
@@ -15,8 +15,11 @@ class Auctioneer(threading.Threading):
 		self.message_queue = Queue.Queue()
 		self.message_types = {'submission': {}}
 		self.terminate = False
-		self.state = ('phase1', 'send-request')
+		self.state = ['phase1', 'send-request']
 		self.sellers_prices = {s:PipeQueue(self.opt['convergence_size']) for s in self.grid.sellers}
+
+		self.name = 'auctioneer'
+		self.converged = False
 
 	
 	def run(self):
@@ -24,11 +27,11 @@ class Auctioneer(threading.Threading):
 			self.read_message()
 			self.process()
 	
-	def recieve(self, sender, content):
+	def receive(self, sender, content):
 		self.message_queue.put((sender, content))
 	
-	def send(self, reciever, content):
-		self.message_server.send((self.name, reciever, content, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+	def send(self, receiver, content):
+		self.message_server.send(self.name, receiver, content, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 	def read_message(self):
 		while not self.message_queue.empty():
@@ -110,7 +113,7 @@ class Auctioneer(threading.Threading):
 			startx = endx
 
 			endy = s['price'] + starty
-			s['pricev'] = (starty, endy)
+			s['price'] = (starty, endy)
 			startx = endy
 
 		# making buyers rectangles
@@ -124,7 +127,7 @@ class Auctioneer(threading.Threading):
 		endy = 0
 		for b in buyers:
 			starty = b['price'] + endy
-			b['pricev'] = (starty, endy)
+			b['price'] = (starty, endy)
 			endy = starty
 		buyers.reverse()
 
@@ -136,7 +139,7 @@ class Auctioneer(threading.Threading):
 			s = sellers[i]
 			for j in range(len(buyers)):
 				b = buyers[j]
-				if (s['pricev'][0] <= b['pricev'][0] and s['pricev'][1] >= b['pricev'][0]) or (b['pricev'[0]] <= s['pricev'][0] and b['pricev'][1] >= s['pricev'][0]):
+				if (s['price'][0] <= b['price'][0] and s['price'][1] >= b['price'][0]) or (b['price'][0] <= s['price'][0] and b['price'][1] >= s['price'][0]):
 					if (s['amount'][0] <= b['amount'][0] and s['amount'][1] >= b['amount'][0]) or (b['amount'[0]] <= s['amount'][0] and b['amount'][1] >= s['amount'][0]):
 						found = True
 						maxb = j
@@ -146,17 +149,21 @@ class Auctioneer(threading.Threading):
 				break
 
 		# calculating price
-		price = (sellers[maxs]['price'] + buyers[maxb]['price']) / 2
+		s = self.message_types['submission'][sellers[maxs]['agents'][0]]
+		b = self.message_types['submission'][sellers[maxb]['agents'][0]]
+		price = (s['price'] + b['price']) / 2
 
 		if maxs > 0:
 			maxs -= 1
 		if maxb > 0:
 			maxb -= 1
 
-		# sending calculated price to participating sellers
+		# sending calculated price and actions of other sellers to participating sellers
 		for i in range(maxs+1):
 			for s in sellers[i]['agents']:
-				self.send(s, {'type':'price', 'content': price})
+				actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
+				del actions[s]
+				self.send(s, {'type':'result', 'content': {'price':price, 'others-actions':actions}})
 
 		# sending calculated price to participating buyers
 		for i in range(maxb+1):
@@ -167,14 +174,16 @@ class Auctioneer(threading.Threading):
 		i = maxs+1
 		while i < len(sellers):
 			for s in sellers[i]['agents']:
-				self.send(s, {'type':'out'})
+				actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
+				del actions[s]
+				self.send(s, {'type':'out', 'content': {'price':price, 'others-actions':actions}})
 			i += 1
 
 		# sending other buyers that they are out of auction
 		i = maxb+1
 		while i < len(buyers):
 			for b in buyers[i]['agents']:
-				self.send(b, {'type':'out'})
+				self.send(b, {'type':'out', 'content': price})
 			i += 1
 
 		# checking convergence
@@ -190,9 +199,11 @@ class Auctioneer(threading.Threading):
 
 		# decision how to progress
 		if converged:
-			self.state = ('phase2')
+			self.state = ['phase2']
+			self.converged = True
 		else:
-			self.state = ('phase1', 'send-request')
+			self.state = ['phase1', 'send-request']
+			self.message_types['submission'] = {}
 	
 	def run_phase2(self):
 		pass

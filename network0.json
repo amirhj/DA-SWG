@@ -1,0 +1,68 @@
+{
+	"agents": [
+		{
+			"id": "a1",
+			"a": 7,
+			"b": 10
+		},
+		{
+			"id": "a2",
+			"a": 9,
+			"b": -70
+		},
+		{
+			"id": "a3",
+			"a": 0,
+			"b": 0
+		},
+		{
+			"id": "a4",
+			"a": 3.5,
+			"b": 3
+		}
+	],
+	"sellers": {
+		"a1": {
+			"price": 5,
+			"max_delivery": 2000
+		},
+		"a2": {
+			"price": 7,
+			"max_delivery": 2800
+		}
+	},
+	"buyers": {
+		"a3": {
+			"price": 5.5,
+			"max_demand": 50,
+			"amplitude": [1.25, 5]
+		},
+		"a4": {
+			"price": 1.25,
+			"max_demand": 4000,
+			"amplitude": [0.85, 1.81]
+		}
+	},
+	"transfer_cost": [
+		{
+			"from": "a1",
+			"to": "a3",
+			"cost": 2
+		},
+		{
+			"from": "a1",
+			"to": "a4",
+			"cost": 1
+		},
+		{
+			"from": "a2",
+			"to": "a4",
+			"cost": 1.5
+		},
+		{
+			"from": "a2",
+			"to": "a3",
+			"cost": 0.5
+		}
+	]
+}

@@ -15,7 +15,7 @@ class PipeQueue:
 		return self.queue
 
 	def is_full(self):
-		return len(self) == self.size
+		return len(self.queue) == self.size
 
 	def get_standard_deviation(self):
 		avg = sum(self.queue)/len(self.queue)

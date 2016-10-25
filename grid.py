@@ -1,11 +1,12 @@
 class Grid:
-	def __init__(self, inputFile):
+	def __init__(self, inputFile, opt):
 		self.grid = inputFile
 		self.agents = {}
 		self.sellers = []
 		self.buyers = []
 		self.transfer_cost = {}
 		self.inf = float('inf')
+		self.opt = opt
 
 		for a in self.grid['agents']:
 			self.agents[a['id']] = a
@@ -15,13 +16,13 @@ class Grid:
 			self.agents[a['id']]['buyers'] = set()
 
 		for s in self.grid['sellers']:
-			self.sellers.append[s]
+			self.sellers.append(s)
 			self.agents[s]['is_seller'] = True
 			self.agents[s]['price'] = self.grid['sellers'][s]['price']
 			self.agents[s]['max_delivery'] = self.grid['sellers'][s]['max_delivery']
 
 		for b in self.grid['buyers']:
-			self.buyers.append[b]
+			self.buyers.append(b)
 			self.agents[b]['is_buyer'] = True
 			self.agents[b]['bid'] = self.grid['buyers'][b]['price']
 			self.agents[b]['max_demand'] = self.grid['buyers'][b]['max_demand']

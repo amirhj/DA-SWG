@@ -8,7 +8,7 @@ class Scheduler:
 
 	def initialize(self):
 		clients = {a:self.agents[a] for a in self.agents}
-		clients['auctioneer'] = auctioneer
+		clients['auctioneer'] = self.auctioneer
 		self.message_server.load(clients)
 		self.message_server.start()
 
@@ -20,20 +20,24 @@ class Scheduler:
 	def run(self):
 		terminate = False
 		while not terminate:
-			terminate = True
-			for a in self.agents:
-				if not self.agents[a].converged:
-					terminate = False
-					break
-
+			terminate = self.auctioneer.converged
+		
+		print 'fert'
+		
 		for a in self.agents:
 			self.agents[a].terminate = True
+			print 'waiting for', a
 			self.agents[a].join()
+			print a, 'joined'
 
 		self.auctioneer.terminate = True
+		print 'waiting for auctioneer'
 		self.auctioneer.join()
+		print 'auctioneer joined'
 		self.message_server.terminate = True
+		print 'waiting for message_server'
 		self.message_server.join()
+		print 'message_server joined'
 	
 	def terminate(self):
 		pass

@@ -77,53 +77,53 @@
 	},
 	"transfer_cost": [
 		{
-			"form": 1,
-			"to": 2,
+			"from": "a1",
+			"to": "a2",
 			"cost": 2
 		},
 		{
-			"form": 1,
-			"to": 4,
+			"from": "a1",
+			"to": "a4",
 			"cost": 1
 		},
 		{
-			"form": 2,
-			"to": 4,
+			"from": "a2",
+			"to": "a4",
 			"cost": 1.5
 		},
 		{
-			"form": 2,
-			"to": 5,
+			"from": "a2",
+			"to": "a5",
 			"cost": 0.5
 		},
 		{
-			"form": 3,
-			"to": 2,
+			"from": "a3",
+			"to": "a2",
 			"cost": 1
 		},
 		{
-			"form": 3,
-			"to": 4,
+			"from": "a3",
+			"to": "a4",
 			"cost": 2.5
 		},
 		{
-			"form": 3,
-			"to": 5,
+			"from": "a3",
+			"to": "a5",
 			"cost": 1.5
 		},
 		{
-			"form": 4,
-			"to": 1,
+			"from": "a4",
+			"to": "a1",
 			"cost": 1
 		},
 		{
-			"form": 5,
-			"to": 2,
+			"from": "a5",
+			"to": "a2",
 			"cost": 2
 		},
 		{
-			"form": 5,
-			"to": 4,
+			"from": "a5",
+			"to": "a4",
 			"cost": 0.5
 		}
 	]
