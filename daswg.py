@@ -6,8 +6,9 @@ from agent import Agent
 from auctioneer import Auctioneer
 from messageserver import MessageServer
 
-opt_pattern = {'-c': {'name': 'convergence_size', 'type': 'int', 'default': 4},
+opt_pattern = {'-c': {'name': 'convergence_size', 'type': 'int', 'default': 4}
                '-s': {'name': 'standard_deviation', 'type': 'float', 'default': 2.0}
+               '--omega': {'name': 'omega', 'type': 'float', 'default': 0.5}
                }
 arg = ArgParser(sys.argv[2:], opt_pattern)
 opt = arg.read()

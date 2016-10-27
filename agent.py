@@ -36,7 +36,7 @@ class Agent(threading.Thread):
 				if m['type'] == 'submission':
 					self.send('auctioneer', {'type':'submission', 'content':self.proposal})
 				elif m['type'] == 'result':
-					self.update_proposal(m['content']['price'], m['content']['others-actions'])
+					self.update_proposal(m['content']['price'], m['content']['others-actions'], m['content']['in_sellers'], m['content']['in_buyers'])
 				elif m['type'] == 'price':
 					pass #self.calculate_utility(m['content'])
 				elif m['type'] == 'out':
@@ -46,8 +46,42 @@ class Agent(threading.Thread):
 			else:
 				raise Exception('Invalid sender '+ sender)
 
-	def update_proposal(self, price, actions):
-		pass
+	def update_proposal(self, price, actions, in_sellers, in_buyers):
+		amount = self.proposal['amount']
+		amount = (1 - self.opt['omega']) * self.best_response(actions, in_sellers, in_buyers) + self.opt['omega'] * amount
+		self.proposal['amount'] = amount
 
-	def calculate_utility(self, price):
-		pass
+	def utility(self, price, actions, in_sellers, in_buyers):
+		utility = 0
+		if self.grid.agents[self.name]['is_seller']:
+			amount = self.quantity(actions, in_sellers, in_buyers)
+			flow = amount / len(in_buyers)
+			flow_cost = sum([flow*self.grid.get_transfer_cost(self.name, b) for b in in_buyers])
+			utility = (price - self.proposal['price']) * amount - flow_cost
+		else:
+			utility = (self.proposal['price'] - price) * amount
+		return utility
+
+	def best_response(self, actions, in_sellers, in_buyers):
+		return self.quantity(actions, in_sellers, in_buyers)
+
+	def quantity(self, actions, in_sellers, in_buyers):
+		demand = 0
+		for b in in_buyers:
+			demand += self.grid.agents[b]['max_demand']
+
+		consomption = 0
+		for s in in_sellers:
+			if s == self.name:
+				consomption += self.proposal['amount']
+			else:
+				consomption += actions[s]
+
+		quantity = 0
+		if demand >= consomption:
+			quantity = self.proposal['amount']
+		else:
+			beta = (consomption - demand) / (len(in_sellers) - 1)
+			quantity = max([0, self.proposal['amount'] - beta])
+			
+		return quantity

@@ -158,33 +158,53 @@ class Auctioneer(threading.Thread):
 		if maxb > 0:
 			maxb -= 1
 
-		# sending calculated price and actions of other sellers to participating sellers
+		# identifing in auction sellers
+		in_sellers = []
 		for i in range(maxs+1):
 			for s in sellers[i]['agents']:
-				actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
-				del actions[s]
-				self.send(s, {'type':'result', 'content': {'price':price, 'others-actions':actions}})
+				in_sellers.append(s)
 
-		# sending calculated price to participating buyers
+		# identifing in auction buyers
+		in_buyers = []
 		for i in range(maxb+1):
 			for b in buyers[i]['agents']:
-				self.send(b, {'type':'price', 'content': price})
+				in_buyers.append(b)
 
-		# sending other sellers that they are out of auction
+		# identifing out of auction sellers
+		out_sellers = []
 		i = maxs+1
 		while i < len(sellers):
 			for s in sellers[i]['agents']:
-				actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
-				del actions[s]
-				self.send(s, {'type':'out', 'content': {'price':price, 'others-actions':actions}})
+				out_sellers.append(s)
 			i += 1
 
-		# sending other buyers that they are out of auction
+		# identifing out of auction buyers
+		out_buyers = []
 		i = maxb+1
 		while i < len(buyers):
 			for b in buyers[i]['agents']:
-				self.send(b, {'type':'out', 'content': price})
+				out_buyers.append(b)
 			i += 1
+
+		# sending calculated price and actions of other sellers to participating sellers
+		for s in in_sellers:
+			actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
+			del actions[s]
+			self.send(s, {'type':'result', 'content': {'price':price, 'others-actions':actions, 'in_sellers':in_sellers, 'in_buyers':in_buyers}})
+
+		# sending calculated price to participating buyers
+		for b in in_buyers:
+			self.send(b, {'type':'price', 'content': {'price':price, 'in_sellers':in_sellers, 'in_buyers':in_buyers}})
+
+		# sending other sellers that they are out of auction
+		for s in out_sellers:
+			actions = {a:self.message_types['submission'][s]['amount'] for a in self.grid.sellers}
+			del actions[s]
+			self.send(s, {'type':'out', 'content': {'price':price, 'others-actions':actions, 'in_sellers':in_sellers, 'in_buyers':in_buyers}})
+
+		# sending other buyers that they are out of auction
+		for b in out_buyers:
+			self.send(b, {'type':'out', 'content': {'price':price, 'in_sellers':in_sellers, 'in_buyers':in_buyers}})
 
 		# checking convergence
 		converged = True
