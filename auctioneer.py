@@ -83,7 +83,7 @@ class Auctioneer(threading.Thread):
 			if not inserted:
 				sellers.append(c)
 
-			self.sellers_prices[s].push(m['price'])
+			self.sellers_prices[s].push(m['amount'])
 
 		# sorting buyers decreasing
 		buyers = []

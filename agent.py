@@ -81,7 +81,10 @@ class Agent(threading.Thread):
 		if demand >= consomption:
 			quantity = self.proposal['amount']
 		else:
-			beta = (consomption - demand) / (len(in_sellers) - 1)
+			count = len(in_sellers)
+			if count > 1:
+				count -= 1
+			beta = (consomption - demand) / count
 			quantity = max([0, self.proposal['amount'] - beta])
 			
 		return quantity
